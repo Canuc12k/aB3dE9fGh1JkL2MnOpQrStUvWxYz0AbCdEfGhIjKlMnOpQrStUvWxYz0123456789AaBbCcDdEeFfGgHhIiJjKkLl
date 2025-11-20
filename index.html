@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bánh kem 3D với Lời chúc</title>
+<style>
+  body { margin: 0; overflow: hidden; background: #000; font-family: Arial, sans-serif; }
+  canvas { display: block; position: absolute; top: 0; left: 0; }
+  .note {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    width: 450px;       /* rộng hơn */
+    padding: 30px;      /* padding lớn hơn */
+    background: #fff8dc;
+    border: 2px solid #d2b48c;
+    border-radius: 12px;
+    box-shadow: 5px 5px 20px rgba(0,0,0,0.5);
+    color: #333;
+    font-size: 20px;    /* chữ lớn hơn */
+    line-height: 1.6;
+    text-align: justify;
+  }
+</style>
+</head>
+<body>
+<div class="note">
+  Chúc bạn sinh nhật thật hạnh phúc! 🎉<br><br>
+  Mong tuổi mới của cậu sẽ thật ổn, mọi việc học tập, công việc hay cuộc sống đều thuận lợi. Hy vọng cậu luôn giữ được tinh thần vui vẻ, thoải mái, gặp nhiều chuyện hay ho và trải nghiệm thú vị. Hãy tận hưởng ngày hôm nay thật chill, ăn uống thoải mái, cười thật nhiều và dành thời gian cho những điều cậu thích. Chúc cậu sức khỏe, may mắn và luôn có những người bạn tốt bên cạnh. Nhìn chung, tuổi mới cứ bình yên, vui vẻ là đủ rồi! 💖
+</div>
+<canvas id="cake3D"></canvas>
+<script>
+const canvas = document.getElementById("cake3D");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+// Dời bánh sang phải
+const cx = canvas.width * 0.65;  
+const cy = canvas.height / 2;
+const GLOBAL_Y_OFFSET = 50;
+
+// =======================
+// BÁNH KEM
+// =======================
+const layers = [
+  {radius: 180, height: 60, color: "#cccccc"},
+  {radius: 130, height: 50, color: "#e6e6e6"},
+  {radius: 80,  height: 40, color: "#ffffff"}
+];
+
+let cakeDots = [];
+let totalHeight = layers.reduce((s, L) => s + L.height, 0);
+
+layers.reduce((off, L) => {
+  const step = 4;
+  for (let r = 0; r <= L.radius; r += step) {
+    const circumference = 2 * Math.PI * r;
+    const n = Math.max(6, Math.floor(circumference / step));
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * 2 * Math.PI;
+      const x = r * Math.cos(ang);
+      const z = r * Math.sin(ang);
+      const y = off + Math.random() * L.height;
+      cakeDots.push({x, y, z, color: L.color});
+    }
+  }
+  return off - L.height;
+}, 0);
+
+// =======================
+// SỐ "1" và "6"
+// =======================
+const numberDots = [];
+const topY = -totalHeight + 10;
+
+const pixel1 = [
+  "...###....",
+  "....#.....",
+  "....#.....",
+  "....#.....",
+  "....#.....",
+  "...##.....",
+  "....#....."
+];
+const pixel6 = [
+  "..####....",
+  ".#....#...",
+  ".#....#...",
+  ".#####....",
+  ".#........",
+  ".#....#...",
+  "..####...."
+];
+
+function addPixelMap(map, offsetX) {
+  const SCALE = 3;
+  const W = map[0].length;
+  for (let y = 0; y < map.length; y++) {
+    for (let x = 0; x < W; x++) {
+      if (map[y][x] === "#") {
+        numberDots.push({
+          x: (x - W/2) * SCALE + offsetX,
+          y: topY - y * SCALE,
+          z: 0,
+          color: "white"
+        });
+      }
+    }
+  }
+}
+addPixelMap(pixel1, -20);
+addPixelMap(pixel6, 20);
+
+// Ngọn lửa
+let flamePos = [
+  {x: -20, y: topY - 24},
+  {x: 20, y: topY - 24}
+];
+
+// =======================
+// SAO
+// =======================
+const stars = [];
+for (let i = 0; i < 600; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    z: Math.random() * 800,
+    radius: Math.random() * 2 + 0.5,
+    speed: Math.random() * 0.1 + 1
+  });
+}
+
+// =======================
+// XOAY (nghiêng 30 độ về màn hình)
+// =======================
+let angleY = 0;
+const ROT_SPEED = 0.6;
+const ANGLE_X = Math.PI / 6;
+
+function drawDots(dots) {
+  for (let p of dots) {
+    const px = p.x * Math.cos(angleY) + p.z * Math.sin(angleY);
+    const pz = -p.x * Math.sin(angleY) + p.z * Math.cos(angleY);
+    const py = p.y * Math.cos(ANGLE_X) - pz * Math.sin(ANGLE_X);
+    const pz2 = p.y * Math.sin(ANGLE_X) + pz * Math.cos(ANGLE_X);
+    const k = 500 / (500 + pz2);
+    const sx = px * k + cx;
+    const sy = py * k + cy - GLOBAL_Y_OFFSET;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 2 * k, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  }
+}
+
+function drawNumberDots(dots) {
+  for (let p of dots) {
+    let px = p.x * Math.cos(angleY) + p.z * Math.sin(angleY);
+    let pz = -p.x * Math.sin(angleY) + p.z * Math.cos(angleY);
+    const py = p.y * Math.cos(ANGLE_X) - pz * Math.sin(ANGLE_X);
+    const pz2 = p.y * Math.sin(ANGLE_X) + pz * Math.cos(ANGLE_X);
+    const k = 500 / (500 + pz2);
+    const sx = px * k + cx;
+    const sy = py * k + cy - GLOBAL_Y_OFFSET;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 2 * k, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  }
+}
+
+function drawStars() {
+  for (let s of stars) {
+    s.z -= s.speed;
+    if (s.z < 1) s.z = 800;
+    const k = 500 / s.z;
+    const x = (s.x - cx) * k + cx;
+    const y = (s.y - cy) * k + cy;
+    ctx.beginPath();
+    ctx.arc(x, y, s.radius * k / 2, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.fill();
+  }
+}
+
+// NGỌN LỬA
+function drawFlame(x, y) {
+  const wobbleX = (Math.random() - 0.5) * 2;
+  const wobbleY = (Math.random() - 0.5) * 1.5;
+  const fx = x + wobbleX;
+  const fy = y + wobbleY;
+  const grd = ctx.createRadialGradient(fx, fy, 1, fx, fy - 10, 12);
+  grd.addColorStop(0, "rgba(255,255,180,1)");
+  grd.addColorStop(0.4, "rgba(255,180,50,0.9)");
+  grd.addColorStop(1, "rgba(255,80,0,0)");
+  ctx.beginPath();
+  ctx.fillStyle = grd;
+  ctx.ellipse(fx, fy, 6, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawFlames() {
+  for (let f of flamePos) {
+    const px = f.x * Math.cos(angleY) + 0 * Math.sin(angleY);
+    const pz = -f.x * Math.sin(angleY) + 0 * Math.cos(angleY);
+    const py = f.y * Math.cos(ANGLE_X) - pz * Math.sin(ANGLE_X);
+    const pz2 = f.y * Math.sin(ANGLE_X) + pz * Math.cos(ANGLE_X);
+    const k = 500 / (500 + pz2);
+    const sx = px * k + cx;
+    const sy = py * k + cy - GLOBAL_Y_OFFSET;
+    drawFlame(sx, sy);
+  }
+}
+
+// =======================
+// ANIMATE
+// =======================
+let lastTime = performance.now();
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let now = performance.now();
+  let dt = (now - lastTime) / 1000;
+  lastTime = now;
+  angleY += dt * ROT_SPEED;
+
+  drawStars();
+  drawDots(cakeDots);
+  drawNumberDots(numberDots);
+  drawFlames();
+
+  // vẽ chữ nhấp nháy dưới bánh
+  const t = now * 0.005;
+  const r = Math.floor(255 * (0.5 + 0.5 * Math.sin(t)));
+  const g = Math.floor(255 * (0.5 + 0.5 * Math.sin(t + 2)));
+  const b = Math.floor(255 * (0.5 + 0.5 * Math.sin(t + 4)));
+  ctx.fillStyle = `rgb(${r},${g},${b})`;
+  ctx.font = "40px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("HAPPY BIRTHDAY NGÂN", cx, canvas.height - 100);
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+onresize = () => {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+};
+</script>
+</body>
+</html>
