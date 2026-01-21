@@ -1,44 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>SNVV</title>
 <style>
   body { margin: 0; overflow: hidden; background: #000; font-family: Arial, sans-serif; }
   canvas { display: block; position: absolute; top: 0; left: 0; }
+
+  /* --- CSS CHO NOTE (LỜI CHÚC) --- */
   .note {
     position: absolute;
-    top: 50px;
-    left: 50px;
-    width: 450px;       /* rộng hơn */
-    padding: 30px;      /* padding lớn hơn */
+    padding: 2vh 2vw; 
     background: #fff8dc;
     border: 2px solid #d2b48c;
     border-radius: 12px;
     box-shadow: 5px 5px 20px rgba(0,0,0,0.5);
     color: #333;
-    font-size: 20px;    /* chữ lớn hơn */
-    line-height: 1.6;
+    font-size: max(14px, 1.2vw); 
+    line-height: 1.5; 
     text-align: justify;
+    max-height: 60vh; /* Giới hạn chiều cao để không che hết màn hình */
+    overflow-y: auto; 
+    z-index: 2; 
+
+    /* Mặc định cho PC (Màn ngang) */
+    top: 5vh;
+    left: 5vw;
+    width: 30vw; 
+    max-width: 350px; 
+  }
+
+  /* --- CSS CHO ĐIỆN THOẠI (Màn dọc) --- */
+  @media (orientation: portrait) {
+    .note {
+      top: 5vh;      /* Cách đỉnh 5% */
+      left: 50%;
+      width: 85vw;   /* Rộng 85% màn hình */
+      max-width: none; 
+      transform: translateX(-50%);
+      font-size: max(14px, 3.5vw); /* Chữ to hơn chút trên đt */
+      padding: 15px; 
+    }
+  }
+
+  /* --- CSS CHO CHỮ HAPPY BIRTHDAY --- */
+  #happyBirthday {
+    position: absolute;
+    font-weight: bold;
+    text-align: center;
+    pointer-events: none;
+    z-index: 1; 
+  }
+
+  @media (orientation: landscape) {
+    #happyBirthday {
+      left: 65%; 
+      bottom: 5vh;
+      transform: translateX(-50%);
+      font-size: 5vh; 
+    }
+  }
+  
+  @media (orientation: portrait) {
+    #happyBirthday {
+      left: 50%; 
+      bottom: 15vh; /* Đẩy cao lên để không đè vào ảnh */
+      transform: translateX(-50%);
+      font-size: 8vw; /* Chữ to theo chiều ngang đt */
+      width: 100%;
+    }
+  }
+
+  /* --- CSS CHO ẢNH RUNG RINH (ĐÃ SỬA RESPONSIVE) --- */
+  .shaking-image {
+    position: fixed;
+    z-index: 10;
+    
+    /* Hiệu ứng rung */
+    animation: shakeLeftRight 2s infinite ease-in-out;
+    transform-origin: bottom center;
+  }
+
+  /* Giao diện PC */
+  @media (orientation: landscape) {
+    .shaking-image {
+        bottom: 20px;
+        left: 20px;
+        width: 190px; /* Giữ nguyên kích thước to trên PC */
+    }
+  }
+
+  /* Giao diện Điện thoại */
+  @media (orientation: portrait) {
+    .shaking-image {
+        bottom: 10px;
+        left: 10px;
+        width: 35vw; /* Ảnh chiếm 35% chiều rộng màn hình */
+        max-width: 150px; /* Không quá to */
+    }
+  }
+
+  @keyframes shakeLeftRight {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
   }
 </style>
 </head>
 <body>
+
 <div class="note">
-  Chúc bạn sinh nhật thật hạnh phúc! 🎉<br><br>
-  Mong tuổi mới của cậu sẽ thật ổn, mọi việc học tập, công việc hay cuộc sống đều thuận lợi. Hy vọng cậu luôn giữ được tinh thần vui vẻ, thoải mái, gặp nhiều chuyện hay ho và trải nghiệm thú vị. Hãy tận hưởng ngày hôm nay thật chill, ăn uống thoải mái, cười thật nhiều và dành thời gian cho những điều cậu thích. Chúc cậu sức khỏe, may mắn và luôn có những người bạn tốt bên cạnh. Nhìn chung, tuổi mới cứ bình yên, vui vẻ là đủ rồi! 💖
+  Chúc ngvi sinh nhật thật vui vẻ và thật hành phúc nhaaa 🥳 <br>
+  Mong tuổi mới của cậu sẽ thật ổn, mọi việc trong học tập hay trong cuộc sống đều thật thuận lợi nhaa 😁. Hy vọng cậu sẽ mãi giữ đc tinh thần vui vẻ, thoải mái, gặp thật nhìu chuyện hay ho và trải nghiệm thú vị. Hãy tận hưởng ngày hôm nay thật chill cậu nhé, ăn thật ngonn 😋, hãy cười thật nhiều và dành thời gian cho những điều cậu thích 😙. Chúc cậu sức khỏe, may mắn và lun có những người bạn tốt bên cạnh . Nhìn chung, tuổi mới cứ bình yên, vui vẻ là đủ rùi 💕
 </div>
+
 <canvas id="cake3D"></canvas>
+<div id="happyBirthday">HAPPY BIRTHDAY</div>
+
+<img src="pic.jfif" class="shaking-image" alt="Birthday Image">
+
 <script>
 const canvas = document.getElementById("cake3D");
 const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+const happyBirthdayText = document.getElementById("happyBirthday");
 
-const cx = canvas.width * 0.65;  
-const cy = canvas.height / 2;
+let cx, cy;
 const GLOBAL_Y_OFFSET = 50;
+let CAKE_SCALE = 1;
 
 const layers = [
   {radius: 180, height: 60, color: "#cccccc"},
@@ -46,80 +137,154 @@ const layers = [
   {radius: 80,  height: 40, color: "#ffffff"}
 ];
 
+const bottomColors = ["#FF1493","#FF69B4","#FFB6C1"];
+const bottomCircleColors = ["#FF1493", "#FF69B4", "#FFB6C1"];
+const borderTopCirclePoints = [300, 220, 180];
+const borderBottomCirclePoints = [300, 220, 180];
+const waveFrequency = [14, 10, 7];
+const wavePoints = [700, 520, 520];
+const waveAmplitudeScale = 0.5;
+const borderCircleOffsetYTop = [-2, -2, -2];
+const borderCircleOffsetYBottom = [2, 2, 2];
+
 let cakeDots = [];
-let totalHeight = layers.reduce((s, L) => s + L.height, 0);
+let borderTopDots = [];
+let borderBottomDots = [];
+let borderBottomCircleDots = [];
+let numberDots = [];
+let totalHeight = layers.reduce((s,L)=>s+L.height, 0);
 
-layers.reduce((off, L) => {
-  const step = 4;
-  for (let r = 0; r <= L.radius; r += step) {
-    const circumference = 2 * Math.PI * r;
-    const n = Math.max(6, Math.floor(circumference / step));
-    for (let i = 0; i < n; i++) {
-      const ang = (i / n) * 2 * Math.PI;
-      const x = r * Math.cos(ang);
-      const z = r * Math.sin(ang);
-      const y = off + Math.random() * L.height;
-      cakeDots.push({x, y, z, color: L.color});
-    }
+function createWavyBorderY(radius, off, L, color, waves, points, topOffsetY) {
+  let arr = [];
+  const amplitude = ((-2 - (L.height+2)) / 2) * waveAmplitudeScale;
+  const yCenter = off + topOffsetY - amplitude;
+  for (let i = 0; i < points; i++) {
+    const t = i / points;
+    const ang = t * Math.PI * 2;
+    const x = radius * Math.cos(ang);
+    const z = radius * Math.sin(ang);
+    const y = yCenter + amplitude * Math.sin(t * waves * Math.PI * 2);
+    arr.push({ x, y, z, color, alwaysVisible: false });
   }
-  return off - L.height;
-}, 0);
+  return arr;
+}
 
+function prepareDots() {
+  cakeDots = [];
+  borderTopDots = [];
+  borderBottomDots = [];
+  borderBottomCircleDots = [];
+  numberDots = [];
 
-const numberDots = [];
-const topY = -totalHeight + 10;
+  layers.reduce((off, L, layerIndex) => {
+    const step = 4;
+    for (let r = 0; r <= L.radius; r += step) {
+      const circumference = 2 * Math.PI * r;
+      const n = Math.max(6, Math.floor(circumference / step));
+      for (let i = 0; i < n; i++) {
+        const ang = (i / n) * 2 * Math.PI;
+        const x = r * Math.cos(ang);
+        const z = r * Math.sin(ang);
+        const y = off + Math.random() * L.height;
+        cakeDots.push({x, y, z, color: L.color});
+      }
+    }
 
-const pixel1 = [
-  "...###....",
-  "....#.....",
-  "....#.....",
-  "....#.....",
-  "....#.....",
-  "...##.....",
-  "....#....."
-];
-const pixel6 = [
-  "..####....",
-  ".#....#...",
-  ".#....#...",
-  ".#####....",
-  ".#........",
-  ".#....#...",
-  "..####...."
-];
+    const edgeN = borderTopCirclePoints[layerIndex];
+    for (let i = 0; i < edgeN; i++) {
+      const ang = (i / edgeN) * Math.PI * 2;
+      const x = L.radius * Math.cos(ang);
+      const z = L.radius * Math.sin(ang);
+      const y = off + borderCircleOffsetYTop[layerIndex];
+      borderTopDots.push({
+        x, y, z,
+        color: "#F075AE",
+        alwaysVisible: (layerIndex === 2)
+      });
+    }
 
-function addPixelMap(map, offsetX) {
-  const SCALE = 3;
-  const W = map[0].length;
-  for (let y = 0; y < map.length; y++) {
-    for (let x = 0; x < W; x++) {
-      if (map[y][x] === "#") {
-        numberDots.push({
-          x: (x - W/2) * SCALE + offsetX,
-          y: topY - y * SCALE,
-          z: 0,
-          color: "white"
-        });
+    const edgeN2 = borderBottomCirclePoints[layerIndex];
+    for (let i = 0; i < edgeN2; i++) {
+      const ang = (i / edgeN2) * Math.PI * 2;
+      const x = L.radius * Math.cos(ang);
+      const z = L.radius * Math.sin(ang);
+      const y = off + L.height + borderCircleOffsetYBottom[layerIndex];
+      borderBottomCircleDots.push({
+        x, y, z,
+        color: bottomCircleColors[layerIndex],
+        alwaysVisible: false
+      });
+    }
+
+    const wavy = createWavyBorderY(
+      L.radius,
+      off,
+      L,
+      bottomColors[layerIndex],
+      waveFrequency[layerIndex],
+      wavePoints[layerIndex],
+      borderCircleOffsetYTop[layerIndex]
+    );
+    borderBottomDots.push(...wavy);
+
+    return off - L.height;
+  }, 0);
+
+  const topY = -totalHeight + 10;
+  const pixel1 = [
+    "...###....",
+    "....#.....",
+    "....#.....",
+    "....#.....",
+    "....#.....",
+    "...##.....",
+    "....#....."
+  ];
+  const pixel6 = [
+    "....#.....",
+    "....#.....",
+    ".....#....",
+    "......#...",
+    ".......#..",
+    ".......#..",
+    "..######.."
+  ];
+
+  function addPixelMap(map, offsetX) {
+    const SCALE = 3;
+    const W = map[0].length;
+    for (let y = 0; y < map.length; y++) {
+      for (let x = 0; x < W; x++) {
+        if (map[y][x] === "#") {
+          numberDots.push({
+            x: (x - W/2) * SCALE + offsetX,
+            y: topY - y * SCALE,
+            z: 0,
+            color: "white"
+          });
+        }
       }
     }
   }
-}
-addPixelMap(pixel1, -20);
-addPixelMap(pixel6, 20);
+  addPixelMap(pixel1, -20);
+  addPixelMap(pixel6, 20);
 
-let flamePos = [
-  {x: -20, y: topY - 24},
-  {x: 20, y: topY - 24}
-];
+  flamePos = [
+    {x: -20, y: topY - 24},
+    {x: 20,  y: topY - 24}
+  ];
+}
+
+prepareDots();
 
 const stars = [];
 for (let i = 0; i < 600; i++) {
   stars.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    z: Math.random() * 800,
-    radius: Math.random() * 2 + 0.5,
-    speed: Math.random() * 0.1 + 1
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    z: Math.random()*800,
+    radius: Math.random()*2 + 0.5,
+    speed: Math.random()*0.1 + 1
   });
 }
 
@@ -129,31 +294,33 @@ const ANGLE_X = Math.PI / 6;
 
 function drawDots(dots) {
   for (let p of dots) {
-    const px = p.x * Math.cos(angleY) + p.z * Math.sin(angleY);
-    const pz = -p.x * Math.sin(angleY) + p.z * Math.cos(angleY);
-    const py = p.y * Math.cos(ANGLE_X) - pz * Math.sin(ANGLE_X);
-    const pz2 = p.y * Math.sin(ANGLE_X) + pz * Math.cos(ANGLE_X);
-    const k = 500 / (500 + pz2);
-    const sx = px * k + cx;
-    const sy = py * k + cy - GLOBAL_Y_OFFSET;
-    ctx.beginPath();
-    ctx.arc(sx, sy, 2 * k, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
-    ctx.fill();
-  }
-}
+    const scaledX = p.x * CAKE_SCALE;
+    const scaledY = p.y * CAKE_SCALE;
+    const scaledZ = p.z * CAKE_SCALE;
 
-function drawNumberDots(dots) {
-  for (let p of dots) {
-    let px = p.x * Math.cos(angleY) + p.z * Math.sin(angleY);
-    let pz = -p.x * Math.sin(angleY) + p.z * Math.cos(angleY);
-    const py = p.y * Math.cos(ANGLE_X) - pz * Math.sin(ANGLE_X);
-    const pz2 = p.y * Math.sin(ANGLE_X) + pz * Math.cos(ANGLE_X);
-    const k = 500 / (500 + pz2);
-    const sx = px * k + cx;
-    const sy = py * k + cy - GLOBAL_Y_OFFSET;
+    const px = scaledX * Math.cos(angleY) + scaledZ * Math.sin(angleY);
+    const pz = -scaledX * Math.sin(angleY) + scaledZ * Math.cos(angleY);
+
+    if (!p.alwaysVisible && (
+      (p.color === "#F075AE" && pz > 86 * CAKE_SCALE) ||
+      (p.color === "#FF1493" && pz > -85 * CAKE_SCALE) ||
+      (p.color === "#FF69B4" && pz > -50 * CAKE_SCALE) ||
+      (p.color === "#FFB6C1" && pz > -20 * CAKE_SCALE) ||
+      (p.color === "#FF1493" && pz > -85 * CAKE_SCALE) ||
+      (p.color === "#FF69B4" && pz > -50 * CAKE_SCALE) ||
+      (p.color === "#FFB6C1" && pz > -20 * CAKE_SCALE)
+    )) continue;
+
+    const py = scaledY * Math.cos(ANGLE_X) - pz * Math.sin(ANGLE_X);
+    const pz2 = scaledY * Math.sin(ANGLE_X) + pz * Math.cos(ANGLE_X);
+
+    const FOCAL_LENGTH = 500;
+    const k = FOCAL_LENGTH / (FOCAL_LENGTH + pz2);
+    const sx = px*k + cx;
+    const sy = py*k + cy - GLOBAL_Y_OFFSET * k * CAKE_SCALE; 
+
     ctx.beginPath();
-    ctx.arc(sx, sy, 2 * k, 0, Math.PI * 2);
+    ctx.arc(sx, sy, 2.5*k * Math.sqrt(CAKE_SCALE), 0, Math.PI*2); 
     ctx.fillStyle = p.color;
     ctx.fill();
   }
@@ -164,39 +331,45 @@ function drawStars() {
     s.z -= s.speed;
     if (s.z < 1) s.z = 800;
     const k = 500 / s.z;
-    const x = (s.x - cx) * k + cx;
-    const y = (s.y - cy) * k + cy;
+    const x = (s.x - cx)*k + cx;
+    const y = (s.y - cy)*k + cy;
     ctx.beginPath();
-    ctx.arc(x, y, s.radius * k / 2, 0, Math.PI * 2);
+    ctx.arc(x, y, s.radius*k/2, 0, Math.PI*2);
     ctx.fillStyle = "rgba(255,255,255,0.8)";
     ctx.fill();
   }
 }
 
 function drawFlame(x, y) {
-  const wobbleX = (Math.random() - 0.5) * 2;
-  const wobbleY = (Math.random() - 0.5) * 1.5;
-  const fx = x + wobbleX;
-  const fy = y + wobbleY;
-  const grd = ctx.createRadialGradient(fx, fy, 1, fx, fy - 10, 12);
+  const fx = x + (Math.random()-0.5)*2 * CAKE_SCALE;
+  const fy = y + (Math.random()-0.5)*1.5 * CAKE_SCALE;
+  const sizeScale = CAKE_SCALE > 1 ? CAKE_SCALE*0.8 : CAKE_SCALE;
+  
+  const grd = ctx.createRadialGradient(fx, fy, 1, fx, fy-10*sizeScale, 12*sizeScale);
   grd.addColorStop(0, "rgba(255,255,180,1)");
   grd.addColorStop(0.4, "rgba(255,180,50,0.9)");
   grd.addColorStop(1, "rgba(255,80,0,0)");
   ctx.beginPath();
+  ctx.ellipse(fx, fy, 6*sizeScale, 12*sizeScale, 0, 0, Math.PI*2);
   ctx.fillStyle = grd;
-  ctx.ellipse(fx, fy, 6, 12, 0, 0, Math.PI * 2);
   ctx.fill();
 }
 
 function drawFlames() {
   for (let f of flamePos) {
-    const px = f.x * Math.cos(angleY) + 0 * Math.sin(angleY);
-    const pz = -f.x * Math.sin(angleY) + 0 * Math.cos(angleY);
-    const py = f.y * Math.cos(ANGLE_X) - pz * Math.sin(ANGLE_X);
-    const pz2 = f.y * Math.sin(ANGLE_X) + pz * Math.cos(ANGLE_X);
-    const k = 500 / (500 + pz2);
-    const sx = px * k + cx;
-    const sy = py * k + cy - GLOBAL_Y_OFFSET;
+    const scaledX = f.x * CAKE_SCALE;
+    const scaledY = f.y * CAKE_SCALE;
+    
+    const px = scaledX * Math.cos(angleY);
+    const pz = -scaledX * Math.sin(angleY);
+    const py = scaledY * Math.cos(ANGLE_X) - pz * Math.sin(ANGLE_X);
+    const pz2 = scaledY * Math.sin(ANGLE_X) + pz * Math.cos(ANGLE_X);
+    
+    const FOCAL_LENGTH = 500;
+    const k = FOCAL_LENGTH / (FOCAL_LENGTH + pz2);
+    const sx = px*k + cx;
+    const sy = py*k + cy - GLOBAL_Y_OFFSET * k * CAKE_SCALE;
+
     drawFlame(sx, sy);
   }
 }
@@ -204,34 +377,66 @@ function drawFlames() {
 let lastTime = performance.now();
 
 function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
   let now = performance.now();
-  let dt = (now - lastTime) / 1000;
+  let dt = (now-lastTime)/1000;
   lastTime = now;
+
   angleY += dt * ROT_SPEED;
 
   drawStars();
   drawDots(cakeDots);
-  drawNumberDots(numberDots);
+  drawDots(borderTopDots);
+  drawDots(borderBottomDots);
+  drawDots(borderBottomCircleDots);
+  drawDots(numberDots);
   drawFlames();
 
   const t = now * 0.005;
-  const r = Math.floor(255 * (0.5 + 0.5 * Math.sin(t)));
-  const g = Math.floor(255 * (0.5 + 0.5 * Math.sin(t + 2)));
-  const b = Math.floor(255 * (0.5 + 0.5 * Math.sin(t + 4)));
-  ctx.fillStyle = `rgb(${r},${g},${b})`;
-  ctx.font = "40px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText("HAPPY BIRTHDAY NGÂN", cx, canvas.height - 100);
+  const r = Math.floor(255*(0.5+0.5*Math.sin(t)));
+  const g = Math.floor(255*(0.5+0.5*Math.sin(t+2)));
+  const b = Math.floor(255*(0.5+0.5*Math.sin(t+4)));
+  happyBirthdayText.style.color = `rgb(${r},${g},${b})`;
+  happyBirthdayText.style.fontFamily = "Arial, sans-serif";
 
   requestAnimationFrame(animate);
 }
-animate();
 
-onresize = () => {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-};
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+
+  if (isPortrait) {
+    // Dọc (Điện thoại)
+    cx = canvas.width / 2;
+    cy = canvas.height * 0.75; // Đẩy bánh lên cao hơn xíu (0.75) để tránh đè vào ảnh dưới
+    CAKE_SCALE = Math.min(0.95, canvas.width / 550); 
+    
+  } else {
+    // Ngang (PC)
+    cx = canvas.width * 0.65;
+    cy = canvas.height / 2;
+    CAKE_SCALE = Math.min(1.2, canvas.height / 450); 
+  }
+
+  stars.length = 0;
+  for (let i = 0; i < 600; i++) {
+    stars.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      z: Math.random()*800,
+      radius: Math.random()*2 + 0.5,
+      speed: Math.random()*0.1 + 1
+    });
+  }
+}
+
+resize();
+window.addEventListener("resize", resize);
+animate();
 </script>
+
 </body>
 </html>
